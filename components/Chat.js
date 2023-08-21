@@ -1,0 +1,25 @@
+import { StyleSheet, View, Text, ImageBackground } from "react-native";
+import { useEffect } from "react";
+
+const Chat = ({ route, navigation }) => {
+  const { name, color } = route.params;
+
+  useEffect(() => {
+    navigation.setOptions({ title: name });
+  }, []);
+
+  return (
+    <View style={[styles.container, { backgroundColor: color }]}>
+      <Text>Hello Screen2!</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+  },
+});
+
+export default Chat;
