@@ -1,14 +1,13 @@
+import { useState } from "react";
 import {
   StyleSheet,
   View,
   Text,
   Button,
   TextInput,
-  Image,
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import { useState } from "react";
 const image = require("../img/Background.png");
 
 const backgroundColors = {
@@ -27,13 +26,6 @@ const Start = ({ navigation }) => {
       <ImageBackground source={image} resizeMode="cover" style={styles.image}>
         <Text>Hello Screen1!</Text>
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={name}
-            onChangeText={setName}
-            placeholder="Type your username here"
-          />
-
           <Text style={styles.textColorSelector}>Choose background color:</Text>
 
           <View style={styles.colorSelector}>
@@ -70,20 +62,19 @@ const Start = ({ navigation }) => {
               onPress={() => setColor(backgroundColors.d)}
             ></TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate("Chat", {
-                name: name,
-                color: color,
-              })
-            }
-          >
-            <Text>Go to Chat</Text>
-          </TouchableOpacity>
         </View>
       </ImageBackground>
+
+      <TextInput
+        style={styles.nameTextInput}
+        onChangeText={setName}
+        value={name}
+        placeholder="Type here ..."
+      />
+      <Button
+        title="Go to Chat"
+        onPress={() => navigation.navigate("Chat", { name, color })}
+      />
     </View>
   );
 };
@@ -91,23 +82,19 @@ const Start = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  image: {
-    flex: 1,
-    justifyContent: "space-between",
-    padding: "3%",
+    justifyContent: "center",
   },
   textInput: {
     fontSize: 16,
     fontWeight: "300",
     color: "#757083",
     padding: 15,
-    borderWidth: 1,
-    borderColor: "#757083",
-    marginTop: 15,
-    marginBottom: 15,
   },
-
+  nameTextInput: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+  },
   inputContainer: {
     flex: 1,
     backgroundColor: "transparent",
@@ -139,6 +126,12 @@ const styles = StyleSheet.create({
     alignContent: "center",
     backgroundColor: "#757083",
     padding: 10,
+  },
+  image: {
+    flex: 1,
+    justifyContent: "space-between",
+    padding: "3%",
+    justifyContent: "center",
   },
 });
 
