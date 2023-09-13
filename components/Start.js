@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
 const image = require("../img/Background.png");
@@ -26,10 +27,16 @@ const Start = ({ navigation }) => {
   const signInUser = () => {
     signInAnonymously(auth)
       .then((result) => {
-        navigation.navigate("Chat", { userID: result.user.uid });
+        console.log(result);
+        navigation.navigate("Chat", {
+          userID: result.user.uid,
+          name: name,
+          color: color,
+        });
         Alert.alert("Signed in Successfully!");
       })
       .catch((error) => {
+        console.log(error);
         Alert.alert("Unable to sign in, try later again.");
       });
   };
@@ -85,13 +92,7 @@ const Start = ({ navigation }) => {
         value={name}
         placeholder="Type here ..."
       />
-      <Button
-        title="Go to Chat"
-        onPress={() => {
-          navigation.navigate("Chat", { name, color });
-          signInUser;
-        }}
-      />
+      <Button title="Go to Chat" onPress={signInUser} />
     </View>
   );
 };
