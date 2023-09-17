@@ -5,33 +5,27 @@ import Chat from "./components/Chat";
 // import react Navigation
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+// import functions for initializing firestore
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
   disableNetwork,
   enableNetwork,
 } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import { useNetInfo } from "@react-native-community/netinfo";
+import { useEffect } from "react";
+import { Alert, LogBox } from "react-native";
 
 // Create the navigator
 const Stack = createNativeStackNavigator();
-import { useNetInfo } from "@react-native-community/netinfo";
-import { useEffect } from "react";
-import { LogBox, Alert } from "react-native";
+
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+
 const App = () => {
-  ///
   const connectionStatus = useNetInfo();
 
-  ///
-  useEffect(() => {
-    if (connectionStatus.isConnected === false) {
-      Alert.alert("Connection Lost!");
-      disableNetwork(db);
-    } else if (connectionStatus.isConnected === true) {
-      enableNetwork(db);
-    }
-  }, [connectionStatus.isConnected]);
-  ///
   const firebaseConfig = {
     apiKey: "AIzaSyCVsMMoma6yU4dlDFjufj4OQjtqsRt_rjo",
     authDomain: "chat-app-ae2bd.firebaseapp.com",
@@ -40,12 +34,24 @@ const App = () => {
     messagingSenderId: "874982213904",
     appId: "1:874982213904:web:d493254eeae19f1268bd95",
   };
-
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
 
-  // Initialize Cloud Firestore and get a reference to the service
+  // Initialize Firestore Database handler
   const db = getFirestore(app);
+
+  // Initialize Firebase Storage handler
+  const storage = getStorage(app);
+
+  useEffect(() => {
+    if (connectionStatus.isConnected === false) {
+      Alert.alert("Connection Lost!!");
+      disableNetwork(db);
+    } else if (connectionStatus.isConnected === true) {
+      enableNetwork(db);
+    }
+  }, [connectionStatus.isConnected]);
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">
@@ -55,6 +61,7 @@ const App = () => {
             <Chat
               isConnected={connectionStatus.isConnected}
               db={db}
+              storage={storage}
               {...props}
             />
           )}
