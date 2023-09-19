@@ -24,8 +24,6 @@ const Stack = createNativeStackNavigator();
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 const App = () => {
-  const connectionStatus = useNetInfo();
-
   const firebaseConfig = {
     apiKey: "AIzaSyCVsMMoma6yU4dlDFjufj4OQjtqsRt_rjo",
     authDomain: "chat-app-ae2bd.firebaseapp.com",
@@ -34,6 +32,8 @@ const App = () => {
     messagingSenderId: "874982213904",
     appId: "1:874982213904:web:d493254eeae19f1268bd95",
   };
+
+  const connectionStatus = useNetInfo();
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
 

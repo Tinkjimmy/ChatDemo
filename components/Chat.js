@@ -20,6 +20,7 @@ const Chat = ({ db, storage, route, navigation, isConnected }) => {
   let unsubMessages;
 
   useEffect(() => {
+    // Set screen title according to given name from prop
     navigation.setOptions({ title: name });
 
     if (isConnected === true) {
@@ -46,17 +47,19 @@ const Chat = ({ db, storage, route, navigation, isConnected }) => {
     };
   }, [isConnected]);
 
-  const loadCachedMessages = async () => {
-    const cachedMessages = (await AsyncStorage.getItem("messages")) || [];
-    setMessages(JSON.parse(cachedMessages));
-  };
-
+  // Save messages to offline storage
   const cacheMessages = async (messagesToCache) => {
     try {
       await AsyncStorage.setItem("messages", JSON.stringify(messagesToCache));
     } catch (error) {
       console.log(error.message);
     }
+  };
+
+  // Get messages from offline storage
+  const loadCachedMessages = async () => {
+    const cachedMessages = (await AsyncStorage.getItem("messages")) || [];
+    setMessages(JSON.parse(cachedMessages));
   };
 
   const onSend = (newMessages) => {
