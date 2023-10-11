@@ -1,155 +1,157 @@
-import { useState } from "react";
 import {
   StyleSheet,
-  View,
+  ImageBackground,
   Text,
-  Button,
+  View,
+  KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
-  ImageBackground,
-  Alert,
 } from "react-native";
+import { useState } from "react";
+import { Platform } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
-const image = require("../img/Background.png");
-
-const backgroundColors = {
-  a: "#474056",
-  b: "#757083",
-  c: "#8A95A5",
-  d: "#B9C6AE",
-};
 
 const Start = ({ navigation }) => {
   const [name, setName] = useState("");
-  const [color, setColor] = useState(backgroundColors.d);
+  const [color, setColor] = useState("#090C08");
+
   const auth = getAuth();
-  // sign-in anonymously
-  const signInUser = () => {
-    signInAnonymously(auth)
-      .then((result) => {
-        console.log(result);
-        navigation.navigate("Chat", {
-          userID: result.user.uid,
-          name: name,
-          color: color,
-        });
-        Alert.alert("Signed in Successfully!");
-      })
-      .catch((error) => {
-        console.log(error);
-        Alert.alert("Unable to sign in, try later again.");
-      });
-  };
+
   return (
     <View style={styles.container}>
-      <ImageBackground source={image} resizeMode="cover" style={styles.image}>
-        <Text>Hello Screen1!</Text>
-        <View style={styles.inputContainer}>
-          <Text style={styles.textColorSelector}>Choose background color:</Text>
-
-          <View style={styles.colorSelector}>
+      <ImageBackground
+        source={require("../img/Background.png")}
+        style={styles.image}
+      >
+        <Text style={styles.title}>Chat App</Text>
+        <View style={styles.innerContainer}>
+          {/* Set name and update name state accordingly */}
+          <TextInput
+            style={styles.textInput}
+            value={name}
+            onChangeText={setName}
+            placeholder="Your name"
+          />
+          {/* Choose color and set state accordingly */}
+          <Text style={styles.colorText}>Choose Background Color</Text>
+          <View style={styles.colorContainer}>
             <TouchableOpacity
-              style={[
-                styles.circle,
-                color === backgroundColors.a && styles.selectedCircle,
-                { backgroundColor: backgroundColors.a },
-              ]}
-              onPress={() => setColor(backgroundColors.a)}
-            ></TouchableOpacity>
+              style={[styles.color, { backgroundColor: "#090C08" }]}
+              onPress={() => setColor("#090C08")}
+            />
             <TouchableOpacity
-              style={[
-                styles.circle,
-                color === backgroundColors.b && styles.selectedCircle,
-                { backgroundColor: backgroundColors.b },
-              ]}
-              onPress={() => setColor(backgroundColors.b)}
-            ></TouchableOpacity>
+              style={[styles.color, { backgroundColor: "#474056" }]}
+              onPress={() => setColor("#474056")}
+            />
             <TouchableOpacity
-              style={[
-                styles.circle,
-                color === backgroundColors.c && styles.selectedCircle,
-                { backgroundColor: backgroundColors.c },
-              ]}
-              onPress={() => setColor(backgroundColors.c)}
-            ></TouchableOpacity>
+              style={[styles.color, { backgroundColor: "#8A95A5" }]}
+              onPress={() => setColor("#8A95A5")}
+            />
             <TouchableOpacity
-              style={[
-                styles.circle,
-                color === backgroundColors.d && styles.selectedCircle,
-                { backgroundColor: backgroundColors.d },
-              ]}
-              onPress={() => {
-                setColor(backgroundColors.d);
-              }}
-            ></TouchableOpacity>
+              style={[styles.color, { backgroundColor: "#B9C6AE" }]}
+              onPress={() => setColor("#B9C6AE")}
+            />
           </View>
+          {/* Enter the Chat Room Button */}
+          <TouchableOpacity
+            style={styles.button}
+            // Sign in, pass name and color to Chat Screen and enter Chat Room
+            onPress={() => {
+              signInAnonymously(auth)
+                .then((result) => {
+                  navigation.navigate("Chat", {
+                    userID: result.user.uid,
+                    name,
+                    color,
+                  });
+                })
+                .catch((error) => {
+                  Alert.alert("Unable to sign in, try later again.");
+                });
+            }}
+          >
+            <Text style={styles.buttonText}>Start Chatting</Text>
+          </TouchableOpacity>
         </View>
       </ImageBackground>
-
-      <TextInput
-        style={styles.nameTextInput}
-        onChangeText={setName}
-        value={name}
-        placeholder="Type here ..."
-      />
-      <Button title="Go to Chat" onPress={signInUser} />
+      {Platform.OS === "ios" ? (
+        <KeyboardAvoidingView behavior="padding" />
+      ) : null}
     </View>
   );
 };
 
+// Styling
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#aaa",
+    alignItems: "center",
     justifyContent: "center",
   },
+  innerContainer: {
+    width: "88%",
+    height: "44%",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    marginBottom: 25,
+    overflow: "scroll",
+  },
   textInput: {
+    width: "88%",
+    padding: 15,
+    borderWidth: 1,
+    marginTop: 25,
+    marginBottom: 10,
     fontSize: 16,
     fontWeight: "300",
     color: "#757083",
-    padding: 15,
-  },
-  nameTextInput: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-  },
-  inputContainer: {
-    flex: 1,
-    backgroundColor: "transparent",
-    padding: "6%",
-    flexBasis: 160,
-  },
-  textColorSelector: {
-    fontSize: 16,
-    fontWeight: "300",
-    color: "#8A95A5",
-  },
-  colorSelector: {
-    flex: 1,
-    justifyContent: "space-around",
-    flexDirection: "row",
-  },
-  circle: {
-    height: 50,
-    width: 50,
-    borderRadius: 25,
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  selectedCircle: {
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
-  },
-  button: {
-    alignContent: "center",
-    backgroundColor: "#757083",
-    padding: 10,
   },
   image: {
     flex: 1,
     justifyContent: "space-between",
-    padding: "3%",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  colorContainer: {
+    flexDirection: "row",
+    width: "80%",
+    justifyContent: "space-between",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  button: {
+    width: "88%",
+    height: 60,
+    backgroundColor: "#4803b0",
+    alignItems: "center",
     justifyContent: "center",
+    marginBottom: 25,
+    backgroundColor: "#757083",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  color: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  colorText: {
+    fontSize: 16,
+    fontWeight: "300",
+    color: "#757083",
+  },
+  title: {
+    fontSize: 45,
+    fontWeight: 600,
+    color: "#FFFFFF",
+    marginTop: "20%",
   },
 });
 

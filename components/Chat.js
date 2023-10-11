@@ -1,21 +1,20 @@
-import { useState, useEffect } from "react";
-import { StyleSheet, View, Platform, KeyboardAvoidingView } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
+import { useEffect, useState } from "react";
 import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import {
-  collection,
-  addDoc,
   onSnapshot,
-  query,
+  collection,
   orderBy,
+  query,
+  addDoc,
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from "./CustomActions";
 import MapView from "react-native-maps";
 
-import CustomActions from "./CustomActions";
-
 const Chat = ({ db, storage, route, navigation, isConnected }) => {
+  const { name, color, userID } = route.params;
   const [messages, setMessages] = useState([]);
-  const { name, userID } = route.params;
 
   let unsubMessages;
 
@@ -24,24 +23,30 @@ const Chat = ({ db, storage, route, navigation, isConnected }) => {
     navigation.setOptions({ title: name });
 
     if (isConnected === true) {
+      // Unregister current onSnapshot() listener to avoid registering multiple
+      // listeners when useEffect code is re-executed.
       if (unsubMessages) unsubMessages();
       unsubMessages = null;
 
+      // Create stream with database to read messages
       const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-      unsubMessages = onSnapshot(q, (docs) => {
-        let newMessages = [];
-        docs.forEach((doc) => {
-          newMessages.push({
+      unsubMessages = onSnapshot(q, (docSnap) => {
+        let msgList = [];
+        docSnap.forEach((doc) => {
+          msgList.push({
             id: doc.id,
             ...doc.data(),
             createdAt: new Date(doc.data().createdAt.toMillis()),
           });
         });
-        cacheMessages(newMessages);
-        setMessages(newMessages);
+        cacheMessages(msgList);
+        setMessages(msgList);
       });
-    } else loadCachedMessages();
+    } else {
+      loadCachedMessages();
+    }
 
+    // Clean up code
     return () => {
       if (unsubMessages) unsubMessages();
     };
@@ -50,7 +55,7 @@ const Chat = ({ db, storage, route, navigation, isConnected }) => {
   // Save messages to offline storage
   const cacheMessages = async (messagesToCache) => {
     try {
-      await AsyncStorage.setItem("messages", JSON.stringify(messagesToCache));
+      await AsyncStorage.setItem("chat", JSON.stringify(messagesToCache));
     } catch (error) {
       console.log(error.message);
     }
@@ -58,75 +63,84 @@ const Chat = ({ db, storage, route, navigation, isConnected }) => {
 
   // Get messages from offline storage
   const loadCachedMessages = async () => {
-    const cachedMessages = (await AsyncStorage.getItem("messages")) || [];
-    setMessages(JSON.parse(cachedMessages));
+    const cachedChat = await AsyncStorage.getItem("chat");
+    cachedChat ? setMessages(JSON.parse(cachedChat)) : setMessages([]);
   };
 
+  // Append new message to firestore
   const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0]);
   };
 
-  const renderInputToolbar = (props) => {
-    if (isConnected === true) return <InputToolbar {...props} />;
-    else return null;
-  };
-
+  // Customize chat bubble
   const renderBubble = (props) => {
     return (
       <Bubble
         {...props}
         wrapperStyle={{
-          right: {
-            backgroundColor: "#000",
-          },
-          left: {
-            backgroundColor: "#FFF",
-          },
+          right: { backgroundColor: "#004d01" },
+          left: { backgroundColor: "#010f78" },
+        }}
+        textStyle={{
+          left: { color: "#fff" },
         }}
       />
     );
   };
 
-  const renderCustomActions = (props) => {
-    return <CustomActions userID={userID} storage={storage} {...props} />;
+  // Only render text iput toolbar when online
+  const renderInputToolbar = (props) => {
+    if (isConnected) return <InputToolbar {...props} />;
+    else return null;
   };
 
+  // Render custom action component
+  const renderCustomActions = (props) => {
+    return <CustomActions storage={storage} userID={userID} {...props} />;
+  };
+
+  // Render element with map and geolocation
   const renderCustomView = (props) => {
     const { currentMessage } = props;
     if (currentMessage.location) {
       return (
-        <MapView
+        <View
           style={{
-            width: 150,
-            height: 100,
             borderRadius: 13,
             margin: 3,
+            overflow: "hidden",
           }}
-          region={{
-            latitude: currentMessage.location.latitude,
-            longitude: currentMessage.location.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-        />
+        >
+          <MapView
+            style={{
+              width: 150,
+              height: 100,
+            }}
+            region={{
+              latitude: currentMessage.location.latitude,
+              longitude: currentMessage.location.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          />
+        </View>
       );
     }
     return null;
   };
 
   return (
-    <View style={styles.container}>
+    // Set background color according to given prop color from start screen
+    <View style={[styles.container, { backgroundColor: color }]}>
+      {/* Chat */}
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
-        onSend={(messages) => onSend(messages)}
         renderActions={renderCustomActions}
         renderCustomView={renderCustomView}
-        user={{
-          _id: userID,
-          name,
-        }}
+        onSend={(messages) => onSend(messages)}
+        user={{ _id: userID, name }}
       />
       {Platform.OS === "android" ? (
         <KeyboardAvoidingView behavior="height" />

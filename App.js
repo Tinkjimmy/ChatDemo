@@ -1,12 +1,13 @@
-// import the screens
-import Start from "./components/Start";
-import Chat from "./components/Chat";
-
-// import react Navigation
+import { StatusBar } from "expo-status-bar";
+import { Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Start from "./components/Start";
+import Chat from "./components/Chat";
+import { useNetInfo } from "@react-native-community/netinfo";
+import { useEffect } from "react";
 
-// import functions for initializing firestore
+// import firebase and firestore
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
@@ -14,16 +15,11 @@ import {
   enableNetwork,
 } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { useNetInfo } from "@react-native-community/netinfo";
-import { useEffect } from "react";
-import { Alert, LogBox } from "react-native";
 
-// Create the navigator
 const Stack = createNativeStackNavigator();
 
-LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
-
 const App = () => {
+  // Your web app's Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCVsMMoma6yU4dlDFjufj4OQjtqsRt_rjo",
     authDomain: "chat-app-ae2bd.firebaseapp.com",
@@ -33,35 +29,37 @@ const App = () => {
     appId: "1:874982213904:web:d493254eeae19f1268bd95",
   };
 
+  // Initialize NetInfo
   const connectionStatus = useNetInfo();
+
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
 
-  // Initialize Firestore Database handler
+  // Initialize Cloud Firestore and Storage and get a reference to the service
   const db = getFirestore(app);
-
-  // Initialize Firebase Storage handler
   const storage = getStorage(app);
 
+  // Disable and enable firestore database access acording to Network status
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
-      Alert.alert("Connection Lost!!");
+      Alert.alert("Connection lost!", "Showing offline messages from cache");
       disableNetwork(db);
-    } else if (connectionStatus.isConnected === true) {
+    } else {
       enableNetwork(db);
     }
   }, [connectionStatus.isConnected]);
 
   return (
+    // Use navigation container to navigate between diferent screens
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">
         <Stack.Screen name="Start" component={Start} />
         <Stack.Screen name="Chat">
           {(props) => (
             <Chat
-              isConnected={connectionStatus.isConnected}
               db={db}
               storage={storage}
+              isConnected={connectionStatus.isConnected}
               {...props}
             />
           )}
