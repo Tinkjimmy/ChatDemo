@@ -62,6 +62,7 @@ Firebase link -> (https://firebase.google.com/)
 ```
 
 Using the Chat App
+
 Once the environment and database have been created and configured, you can now use the app. To start the app, navigate to the root folder of the project and use -npm expo start (if using android emmulator, you can also run using -npm expo start --android). Starting the app with -npm expo start --offline with enable offline testing.
 Note: Expo only supports Node up to version 16.19.0 so make sure to change the version if you are running a newer version of node (use version manager -nvm use 16.19.0)
 
