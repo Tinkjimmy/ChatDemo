@@ -27,10 +27,43 @@ before joining the chat
   and location data.
 - Data gets stored online and offline.
 
-  **Database Configuration** <br>
-This app utilizes FireStore Database to store the data. You can configure the database by going to https://firebase.google.com/ 
-and creating a new project if you dont already have one set up. When setting up the database, make sure to change "allow read, write: if false;" to "allow read, write: if true;" in the rules tab.
-Then copy the FireBase configuration from the database and put it in the App.js file
+## Setting up the Environment
+
+`npx create-expo-app chat_app --template`
+New React Native project
+
+`npm install - expo-cli`
+Install Expo
+
+`expo start or npm start`
+Start Expo
+
+### Setting up Google's Firebase Database
+
+Firebase link -> (https://firebase.google.com/)
+
+- Sign-up or sign in to Firebase
+- `npm install firebase` to add firebase connection into your project directory
+- Copy the Firebase Config from the project setting tab and paste into you App.js file
+- In order to allow read and write access to the database - navigate to the rules tab in the console and change the code from `allow read, write: if false;` to `allow read, write: if true;` then click publish
+
+### Packages to install
+
+```
+* npm install --save @react-navigation/native @react-navigation/native-stack
+* expo install react-native-screens react-native-safe-area-context
+* npm install react-native-gifted-chat --save
+* npm install firebase@9.13.0 --save
+* expo install @react-native-async-storage/async-storage
+* expo install @react-native-community/netinfo
+* expo install expo-image-picker
+* expo install expo-location
+* expo install react-native-maps
+```
+
+Using the Chat App
+Once the environment and database have been created and configured, you can now use the app. To start the app, navigate to the root folder of the project and use -npm expo start (if using android emmulator, you can also run using -npm expo start --android). Starting the app with -npm expo start --offline with enable offline testing.
+Note: Expo only supports Node up to version 16.19.0 so make sure to change the version if you are running a newer version of node (use version manager -nvm use 16.19.0)
 
 ### Android Studio
 
