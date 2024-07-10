@@ -26,13 +26,15 @@
     "expo-image-picker": "~14.1.1",
     "ws": ">=8.17.1",
      "braces": ">=3.0.3",
-     "protobufjs": ">=7.2.5"
+     "protobufjs": ">=7.2.5",
+      "ip": ">=1.1.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "ws": ">=8.17.1",
     "braces": ">=3.0.3",
-    "protobufjs": ">=7.2.5"
+    "protobufjs": ">=7.2.5",
+     "ip": ">=1.1.9"
   },
   "private": true
 }
